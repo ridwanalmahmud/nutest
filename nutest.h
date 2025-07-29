@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <time.h>
 #include <float.h>
+#include <math.h>
 
 // ANSI color codes
 #define COLOR_RESET "\033[0m"
@@ -238,36 +239,6 @@ static TestRegistry test_registry = {NULL, 0};
         register_test_case(&test_case);                             \
     }                                                               \
     static TestResult test_suite_name##_##test_name(void)
-
-// Fixture support
-#define FIXTURE_TEST(test_suite_name, test_name) \
-    TEST_F(test_suite_name, test_name)
-
-// Fixture support
-#define FIXTURE(test_suite_name)                                        \
-    typedef struct test_suite_name##_Fixture test_suite_name##_Fixture; \
-    struct test_suite_name##_Fixture
-
-#define SET_UP() static void SetUp(test_suite_name##_Fixture *fixture)
-
-#define TEAR_DOWN() static void TearDown(test_suite_name##_Fixture *fixture)
-
-#define FIXTURE_TEST_F(test_suite_name, test_name)                          \
-    static TestResult test_suite_name##_##test_name##_Impl(                 \
-        test_suite_name##_Fixture *fixture);                                \
-    static TestResult test_suite_name##_##test_name(void) {                 \
-        test_suite_name##_Fixture fixture;                                  \
-        memset(&fixture, 0, sizeof(fixture));                               \
-        SetUp(&fixture);                                                    \
-        TestResult result = test_suite_name##_##test_name##_Impl(&fixture); \
-        TearDown(&fixture);                                                 \
-        return result;                                                      \
-    }                                                                       \
-    TEST_F(test_suite_name, test_name) {                                    \
-        return test_suite_name##_##test_name();                             \
-    }                                                                       \
-    static TestResult test_suite_name##_##test_name##_Impl(                 \
-        test_suite_name##_Fixture *fixture)
 
 // Skip test macro
 #define SKIP() return TEST_SKIP
