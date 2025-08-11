@@ -82,13 +82,13 @@ static TestRegistry test_registry = {NULL, 0};
         if ((expected) != (actual)) {                               \
             fprintf(stderr,                                         \
                     "[ " COLOR_RED "FAIL" COLOR_RESET               \
-                    "    ] %s:%d: Expected: %s == %s (%d vs %d)\n", \
+                    "    ] %s:%d: Expected: %s == %s (%g vs %g)\n", \
                     __FILE__,                                       \
                     __LINE__,                                       \
                     #expected,                                      \
                     #actual,                                        \
-                    (expected),                                     \
-                    (actual));                                      \
+                    (double)(expected),                             \
+                    (double)(actual));                              \
             return TEST_FAIL;                                       \
         }                                                           \
     } while (0)
@@ -98,78 +98,179 @@ static TestRegistry test_registry = {NULL, 0};
         if ((val1) == (val2)) {                                        \
             fprintf(stderr,                                            \
                     "[ " COLOR_RED "FAIL" COLOR_RESET                  \
-                    "    ] %s:%d: Expected: %s != %s (both are %d)\n", \
+                    "    ] %s:%d: Expected: %s != %s (both are %g)\n", \
                     __FILE__,                                          \
                     __LINE__,                                          \
                     #val1,                                             \
                     #val2,                                             \
-                    (val1));                                           \
+                    (double)(val1));                                   \
             return TEST_FAIL;                                          \
         }                                                              \
     } while (0)
 
-#define ASSERT_FLOAT_EQ(expected, actual)                             \
-    do {                                                              \
-        float _expected = (expected);                                 \
-        float _actual = (actual);                                     \
-        float _diff = fabsf(_expected - _actual);                     \
-        if (_diff > FLT_EPSILON) {                                    \
-            fprintf(stderr,                                           \
-                    "[ " COLOR_RED "FAIL" COLOR_RESET                 \
-                    "    ] %s:%d: Expected: %s == %s (%.9g vs %.9g, " \
-                    "diff %.9g)\n",                                   \
-                    __FILE__,                                         \
-                    __LINE__,                                         \
-                    #expected,                                        \
-                    #actual,                                          \
-                    _expected,                                        \
-                    _actual,                                          \
-                    _diff);                                           \
-            return TEST_FAIL;                                         \
-        }                                                             \
+#define ASSERT_GT(val1, val2)                                      \
+    do {                                                           \
+        if ((val1) <= (val2)) {                                    \
+            fprintf(stderr,                                        \
+                    "[ " COLOR_RED "FAIL" COLOR_RESET              \
+                    "    ] %s:%d: Expected: %s > %s (%g vs %g)\n", \
+                    __FILE__,                                      \
+                    __LINE__,                                      \
+                    #val1,                                         \
+                    #val2,                                         \
+                    (double)(val1),                                \
+                    (double)(val2));                               \
+            return TEST_FAIL;                                      \
+        }                                                          \
     } while (0)
 
-#define ASSERT_DOUBLE_EQ(expected, actual)                              \
-    do {                                                                \
-        double _expected = (expected);                                  \
-        double _actual = (actual);                                      \
-        double _diff = fabs(_expected - _actual);                       \
-        if (_diff > DBL_EPSILON) {                                      \
-            fprintf(stderr,                                             \
-                    "[ " COLOR_RED "FAIL" COLOR_RESET                   \
-                    "    ] %s:%d: Expected: %s == %s (%.17g vs %.17g, " \
-                    "diff %.17g)\n",                                    \
-                    __FILE__,                                           \
-                    __LINE__,                                           \
-                    #expected,                                          \
-                    #actual,                                            \
-                    _expected,                                          \
-                    _actual,                                            \
-                    _diff);                                             \
-            return TEST_FAIL;                                           \
-        }                                                               \
+#define ASSERT_LT(val1, val2)                                      \
+    do {                                                           \
+        if ((val1) >= (val2)) {                                    \
+            fprintf(stderr,                                        \
+                    "[ " COLOR_RED "FAIL" COLOR_RESET              \
+                    "    ] %s:%d: Expected: %s < %s (%g vs %g)\n", \
+                    __FILE__,                                      \
+                    __LINE__,                                      \
+                    #val1,                                         \
+                    #val2,                                         \
+                    (double)(val1),                                \
+                    (double)(val2));                               \
+            return TEST_FAIL;                                      \
+        }                                                          \
     } while (0)
 
-#define ASSERT_NEAR(expected, actual, tolerance)                        \
-    do {                                                                \
-        double _expected = (expected);                                  \
-        double _actual = (actual);                                      \
-        double _diff = fabs(_expected - _actual);                       \
-        if (_diff > (tolerance)) {                                      \
-            fprintf(stderr,                                             \
-                    "[ " COLOR_RED "FAIL" COLOR_RESET                   \
-                    "    ] %s:%d: Expected: %s ~= %s (%.17g vs %.17g, " \
-                    "diff %.17g > tol %.17g)\n",                        \
-                    __FILE__,                                           \
-                    __LINE__,                                           \
-                    #expected,                                          \
-                    #actual,                                            \
-                    _expected,                                          \
-                    _actual,                                            \
-                    _diff,                                              \
-                    (tolerance));                                       \
-            return TEST_FAIL;                                           \
-        }                                                               \
+#define ASSERT_GE(val1, val2)                                       \
+    do {                                                            \
+        if ((val1) < (val2)) {                                      \
+            fprintf(stderr,                                         \
+                    "[ " COLOR_RED "FAIL" COLOR_RESET               \
+                    "    ] %s:%d: Expected: %s >= %s (%g vs %g)\n", \
+                    __FILE__,                                       \
+                    __LINE__,                                       \
+                    #val1,                                          \
+                    #val2,                                          \
+                    (double)(val1),                                 \
+                    (double)(val2));                                \
+            return TEST_FAIL;                                       \
+        }                                                           \
+    } while (0)
+
+#define ASSERT_LE(val1, val2)                                       \
+    do {                                                            \
+        if ((val1) > (val2)) {                                      \
+            fprintf(stderr,                                         \
+                    "[ " COLOR_RED "FAIL" COLOR_RESET               \
+                    "    ] %s:%d: Expected: %s <= %s (%g vs %g)\n", \
+                    __FILE__,                                       \
+                    __LINE__,                                       \
+                    #val1,                                          \
+                    #val2,                                          \
+                    (double)(val1),                                 \
+                    (double)(val2));                                \
+            return TEST_FAIL;                                       \
+        }                                                           \
+    } while (0)
+
+#define ASSERT_FLOAT_EQ(val1, val2)                               \
+    do {                                                          \
+        float _val1 = (val1);                                     \
+        float _val2 = (val2);                                     \
+        float _diff = fabsf(_val1 - _val2);                       \
+        if (_diff > FLT_EPSILON) {                                \
+            fprintf(stderr,                                       \
+                    "[ " COLOR_RED "FAIL" COLOR_RESET             \
+                    "    ] %s:%d: val1: %s == %s (%.9g vs %.9g, " \
+                    "diff %.9g)\n",                               \
+                    __FILE__,                                     \
+                    __LINE__,                                     \
+                    #val1,                                        \
+                    #val2,                                        \
+                    _val1,                                        \
+                    _val2,                                        \
+                    _diff);                                       \
+            return TEST_FAIL;                                     \
+        }                                                         \
+    } while (0)
+
+#define ASSERT_DOUBLE_EQ(val1, val2)                                \
+    do {                                                            \
+        double _val1 = (val1);                                      \
+        double _val2 = (val2);                                      \
+        double _diff = fabs(_val1 - _val2);                         \
+        if (_diff > DBL_EPSILON) {                                  \
+            fprintf(stderr,                                         \
+                    "[ " COLOR_RED "FAIL" COLOR_RESET               \
+                    "    ] %s:%d: val1: %s == %s (%.17g vs %.17g, " \
+                    "diff %.17g)\n",                                \
+                    __FILE__,                                       \
+                    __LINE__,                                       \
+                    #val1,                                          \
+                    #val2,                                          \
+                    _val1,                                          \
+                    _val2,                                          \
+                    _diff);                                         \
+            return TEST_FAIL;                                       \
+        }                                                           \
+    } while (0)
+
+#define ASSERT_NEAR(val1, val2, tolerance)                          \
+    do {                                                            \
+        double _val1 = (val1);                                      \
+        double _val2 = (val2);                                      \
+        double _diff = fabs(_val1 - _val2);                         \
+        if (_diff > (tolerance)) {                                  \
+            fprintf(stderr,                                         \
+                    "[ " COLOR_RED "FAIL" COLOR_RESET               \
+                    "    ] %s:%d: val1: %s ~= %s (%.17g vs %.17g, " \
+                    "diff %.17g > tol %.17g)\n",                    \
+                    __FILE__,                                       \
+                    __LINE__,                                       \
+                    #val1,                                          \
+                    #val2,                                          \
+                    _val1,                                          \
+                    _val2,                                          \
+                    _diff,                                          \
+                    (tolerance));                                   \
+            return TEST_FAIL;                                       \
+        }                                                           \
+    } while (0)
+
+#define ASSERT_STREQ(str1, str2)                            \
+    do {                                                    \
+        const char *_str1 = (str1);                         \
+        const char *_str2 = (str2);                         \
+        if (strcmp(_str1, _str2) != 0) {                    \
+            fprintf(stderr,                                 \
+                    "[ " COLOR_RED "FAIL" COLOR_RESET       \
+                    "    ] %s:%d: Expected: %s == %s\n"     \
+                    "                  \"%s\" vs \"%s\"\n", \
+                    __FILE__,                               \
+                    __LINE__,                               \
+                    #str1,                                  \
+                    #str2,                                  \
+                    _str1,                                  \
+                    _str2);                                 \
+            return TEST_FAIL;                               \
+        }                                                   \
+    } while (0)
+
+#define ASSERT_STRNE(str1, str2)                                \
+    do {                                                        \
+        const char *_str1 = (str1);                             \
+        const char *_str2 = (str2);                             \
+        if (strcmp(_str1, _str2) == 0) {                        \
+            fprintf(stderr,                                     \
+                    "[ " COLOR_RED "FAIL" COLOR_RESET           \
+                    "    ] %s:%d: Expected: %s != %s\n"         \
+                    "                  Both equal to \"%s\"\n", \
+                    __FILE__,                                   \
+                    __LINE__,                                   \
+                    #str1,                                      \
+                    #str2,                                      \
+                    _str1);                                     \
+            return TEST_FAIL;                                   \
+        }                                                       \
     } while (0)
 
 #define ASSERT_NULL(ptr)                                  \
@@ -243,18 +344,28 @@ static TestRegistry test_registry = {NULL, 0};
 // Skip test macro
 #define SKIP() return TEST_SKIP
 
-// Performance measurement macros
-#define BENCHMARK_START()                     \
-    struct timespec _bench_start, _bench_end; \
-    clock_gettime(CLOCK_MONOTONIC, &_bench_start)
+// Benchmarking macros
+#define BENCHMARK_START(name)                               \
+    struct timespec _bench_start_##name, _bench_end_##name; \
+    clock_gettime(CLOCK_MONOTONIC, &_bench_start_##name)
 
-#define BENCHMARK_END(name)                                                 \
-    clock_gettime(CLOCK_MONOTONIC, &_bench_end);                            \
-    double _bench_time = (_bench_end.tv_sec - _bench_start.tv_sec) +        \
-                         (_bench_end.tv_nsec - _bench_start.tv_nsec) / 1e9; \
-    printf("[ " COLOR_CYAN "BENCH" COLOR_RESET "   ] %s: %.9f seconds\n",   \
-           name,                                                            \
-           _bench_time)
+#define BENCHMARK_END(name)                                               \
+    clock_gettime(CLOCK_MONOTONIC, &_bench_end_##name);                   \
+    double _bench_time_##name =                                           \
+        (_bench_end_##name.tv_sec - _bench_start_##name.tv_sec) +         \
+        (_bench_end_##name.tv_nsec - _bench_start_##name.tv_nsec) / 1e9;  \
+    printf("[ " COLOR_CYAN "BENCH" COLOR_RESET "   ] %s: %.9f seconds\n", \
+           #name,                                                         \
+           _bench_time_##name)
+
+#define BENCHMARK_FUNCTION(func, name, iterations)           \
+    do {                                                     \
+        BENCHMARK_START(name);                               \
+        for (int _iter = 0; _iter < (iterations); _iter++) { \
+            func;                                            \
+        }                                                    \
+        BENCHMARK_END(name);                                 \
+    } while (0)
 
 // Test registration function
 static void register_test_case(TestCase *test_case) {
